@@ -573,3 +573,6 @@ gradle-app.setting
 
 # Generated Files
 .generated
+
+# Help Files
+HELP.md
