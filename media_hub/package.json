@@ -1,0 +1,52 @@
+{
+  "name": "media_hub",
+  "version": "0.1.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amdigbari/dates",
+    "directory": "media_hub"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write '**/*.{js,ts,jsx,tsx,json,scss,css,mjs}'",
+    "generate-openapi-ts": "openapi-typescript ../media_manager/api_spec/sample.yaml -o ./src/services/.generated/types/sample.d.ts"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.14",
+    "@mui/material": "^5.15.14",
+    "@mui/material-nextjs": "^5.15.11",
+    "@tanstack/react-query": "^5.28.6",
+    "clsx": "^2.1.0",
+    "next": "14.1.4",
+    "next-translate": "^2.6.2",
+    "openapi-fetch": "^0.9.3",
+    "ramda": "^0.29.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.51.1",
+    "react-use": "^17.5.0"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^14.1.4",
+    "@tanstack/react-query-devtools": "^5.28.6",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/node": "^20",
+    "@types/ramda": "^0.29.11",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "cypress": "^13.7.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.4",
+    "next-translate-plugin": "^2.6.2",
+    "openapi-typescript": "^6.7.5",
+    "openapi-typescript-helpers": "^0.0.7",
+    "prettier": "^3.2.5",
+    "typescript": "^5"
+  }
+}

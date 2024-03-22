@@ -1,0 +1,13 @@
+# build
+**/.next/*
+**/dist/*
+
+# node_modules
+**/node_modules/*
+
+# public routes
+**/public/*
+!**/public/locales
+
+# testing
+**/coverage/*
