@@ -2,7 +2,7 @@ import { QueryClient, type UseMutationOptions, type UseQueryOptions, isServer } 
 import createClient, { type ClientMethod, type FetchOptions, type FetchResponse } from 'openapi-fetch';
 import type { FilterKeys, HttpMethod, PathsWithMethod as PathsWith } from 'openapi-typescript-helpers';
 
-import type { paths as SamplePaths } from './.generated/types/sample';
+import type { paths as MediaManagerPaths } from './.generated/types/media-manager';
 
 // NOTE: This approach assumes that every backed services will be served via a API Gateway
 // and there will be only one base_url for every service API paths
@@ -11,7 +11,7 @@ const API_BASE_URL = process.env.NEXT_APP_API_BASE_URL || 'http://localhost:8000
 type PathGen<BasePath extends string, Paths> = {
   [k in keyof Paths & string as `${BasePath}${k}`]: Paths[k];
 };
-type Paths = PathGen<'sample:', SamplePaths>;
+type Paths = PathGen<'media-manager:', MediaManagerPaths>;
 
 /**
  *
