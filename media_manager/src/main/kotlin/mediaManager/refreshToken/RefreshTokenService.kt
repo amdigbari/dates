@@ -19,17 +19,17 @@ class RefreshTokenService(
     private val tokenService: TokenService,
     private val jwtProperties: JWTProperties,
 ) {
-    fun findUserDetailsByToken(token: String): UserDetails? {
+    fun findUserDetailsByToken(token: String): UserDetails {
         val refreshToken = refreshTokenRepository.findByToken(token)
 
         return if (refreshToken.isPresent) {
             userDetailsService.loadUserByUsername(refreshToken.get().user.email)
         } else {
-            null
+            throw IllegalArgumentException("Refresh token not found!")
         }
     }
 
-    fun generate(userDetails: UserDetails): String? {
+    fun generate(userDetails: UserDetails): String {
         val user = userService.findByEmail(userDetails.username)
 
         if (user.isPresent) {
@@ -48,7 +48,7 @@ class RefreshTokenService(
                 token
             }
         } else {
-            return null
+            throw IllegalArgumentException("Email not found!")
         }
     }
 
