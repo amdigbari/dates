@@ -1,0 +1,33 @@
+pre-commit:
+  parallel: true
+  commands:
+    media_hub_scripts:
+      glob: 'media_hub/*.{js,ts,jsx,tsx,mjs}'
+      run: yarn format {staged_files} && cd media_hub && yarn lint && cd .. && git add .
+    media_hub_assets:
+      glob: 'media_hub/*.{json,scss,css}'
+      run: yarn format {staged_files} && git add .
+    media_manager:
+      glob: 'media_manager/**/*.{kt,kts}'
+      run: ktlint --format {staged_files} && ktlint {staged_files} && git add .
+
+format:
+  parallel: true
+  commands:
+    media_hub:
+      glob: 'media_hub/**/*.{js,ts,jsx,tsx,json,scss,css,mjs}'
+      run: yarn format {all_files}
+    media_manager:
+      glob: 'media_manager/**/*.{kt,kts}'
+      run: ktlint --format {all_files}
+
+lint:
+  parallel: true
+  commands:
+    media_hub:
+      glob: 'media_hub/**/*.{js,ts,jsx,tsx,mjs}'
+      root: 'media_hub'
+      run: yarn lint
+    media_manager:
+      glob: 'media_manager/**/*.{kt,kts}'
+      run: ktlint {all_files}
