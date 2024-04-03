@@ -7,7 +7,9 @@ import mediaManager.refreshToken.RefreshTokenService
 import mediaManager.user.CustomUserDetailsService
 import mediaManager.user.User
 import mediaManager.user.UserService
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
@@ -23,7 +25,7 @@ class AuthenticationService(
     private val expiredTokenService: ExpiredTokenService,
     private val jwtProperties: JWTProperties,
 ) {
-    fun login(loginRequest: LoginRequestDto): LoginResponseDto? {
+    fun login(loginRequest: LoginRequestDto): LoginResponseDto {
         authManager.authenticate(UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password))
 
         val user = userDetailsService.loadUserByUsername(loginRequest.email)
@@ -37,25 +39,25 @@ class AuthenticationService(
                 refreshToken = refreshToken,
             )
         } else {
-            null
+            throw BadCredentialsException("Incorrect Email or Password!")
         }
     }
 
-    fun register(user: User): User? {
+    fun register(user: User): User {
         return userService.createUser(user)
     }
 
-    fun refreshAccessToken(token: String): String? {
+    fun refreshAccessToken(token: String): String {
         val extractedEmail = tokenService.extractEmail(token)
 
-        return extractedEmail?.let { email ->
+        return extractedEmail.let { email ->
             val currentUserDetails = userDetailsService.loadUserByUsername(email)
             val refreshTokenUserDetails = refreshTokenService.findUserDetailsByToken(token)
 
             if (!tokenService.isExpired(token) && currentUserDetails.username == refreshTokenUserDetails?.username) {
                 generateAccessToken(currentUserDetails)
             } else {
-                null
+                throw AccessDeniedException("Invalid refresh token!")
             }
         }
     }

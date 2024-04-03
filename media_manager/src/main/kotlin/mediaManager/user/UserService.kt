@@ -1,5 +1,6 @@
 package mediaManager.user
 
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.Optional
@@ -9,7 +10,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
-    fun createUser(user: User): User? {
+    fun createUser(user: User): User {
         val founded = this.findByEmail(user.email)
 
         return if (!founded.isPresent) {
@@ -18,7 +19,7 @@ class UserService(
             )
             user
         } else {
-            null
+            throw DuplicateKeyException("User already exists!")
         }
     }
 

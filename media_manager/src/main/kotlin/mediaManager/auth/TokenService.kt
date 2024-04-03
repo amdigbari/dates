@@ -29,7 +29,7 @@ class TokenService(jwtProperties: JWTProperties) {
             .signWith(secretKey)
             .compact()
 
-    fun extractEmail(token: String): String? = getAllClaims(token).subject
+    fun extractEmail(token: String): String = getAllClaims(token).subject
 
     fun isExpired(token: String): Boolean =
         getAllClaims(token)
