@@ -6,16 +6,34 @@ servers:
 - url: http://localhost:8080
   description: Generated server url
 paths:
+  /api/auth/send-otp:
+    post:
+      tags:
+      - authentication-controller
+      operationId: sendOtp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendOTPRequestDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
   /api/auth/register:
     post:
       tags:
-      - auth-controller
+      - authentication-controller
       operationId: register
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/RegisterRequestDto'
         required: true
       responses:
         "200":
@@ -27,7 +45,7 @@ paths:
   /api/auth/refresh-token:
     post:
       tags:
-      - auth-controller
+      - authentication-controller
       operationId: refreshToken
       requestBody:
         content:
@@ -45,7 +63,7 @@ paths:
   /api/auth/login:
     post:
       tags:
-      - auth-controller
+      - authentication-controller
       operationId: login
       requestBody:
         content:
@@ -96,7 +114,7 @@ paths:
   /api/auth/logout:
     delete:
       tags:
-      - auth-controller
+      - authentication-controller
       operationId: logout
       parameters:
       - name: Authorization
@@ -113,6 +131,26 @@ paths:
                 type: boolean
 components:
   schemas:
+    SendOTPRequestDto:
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+    RegisterRequestDto:
+      required:
+      - email
+      - otp
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+        password:
+          type: string
     User:
       required:
       - email
