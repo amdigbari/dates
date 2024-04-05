@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long = 0, // Added the 0, so I can create instance without error. It will be overwritten by DB.
     @Column(nullable = false, unique = true)
     val email: String,
     @Column(nullable = false)

@@ -20,35 +20,27 @@ class RefreshTokenService(
     private val jwtProperties: JWTProperties,
 ) {
     fun findUserDetailsByToken(token: String): UserDetails {
-        val refreshToken = refreshTokenRepository.findByToken(token)
+        val refreshToken = refreshTokenRepository.findByToken(token).get()
 
-        return if (refreshToken.isPresent) {
-            userDetailsService.loadUserByUsername(refreshToken.get().user.email)
-        } else {
-            throw IllegalArgumentException("Refresh token not found!")
-        }
+        return userDetailsService.loadUserByUsername(refreshToken.user.email)
     }
 
     fun generate(userDetails: UserDetails): String {
-        val user = userService.findByEmail(userDetails.username)
+        val user = userService.findByEmail(userDetails.username).get()
 
-        if (user.isPresent) {
-            val currentRefreshToken = refreshTokenRepository.findByUser(user.get())
+        val currentRefreshToken = refreshTokenRepository.findByUser(user)
 
-            return if (currentRefreshToken.isPresent) {
-                currentRefreshToken.get().token
-            } else {
-                refreshTokenRepository.deleteAllByUserId(user.get())
-                val token =
-                    tokenService.generate(
-                        userDetails = userDetails,
-                        expirationDate = Date(System.currentTimeMillis() + jwtProperties.refreshTokenExpiration),
-                    )
-                refreshTokenRepository.save(RefreshToken(token = token, user = user.get()))
-                token
-            }
+        return if (currentRefreshToken.isPresent) {
+            currentRefreshToken.get().token
         } else {
-            throw IllegalArgumentException("Email not found!")
+            refreshTokenRepository.deleteAllByUserId(user)
+            val token =
+                tokenService.generate(
+                    userDetails = userDetails,
+                    expirationDate = Date(System.currentTimeMillis() + jwtProperties.refreshTokenExpiration),
+                )
+            refreshTokenRepository.save(RefreshToken(token = token, user = user))
+            token
         }
     }
 
