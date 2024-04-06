@@ -15,6 +15,10 @@ import org.hibernate.annotations.SQLDelete
 import java.sql.Timestamp
 import java.time.Instant
 
+/**
+ * Entity that holds the value of refresh tokens for each user.
+ * The delete methodology of this table is soft.
+ */
 @Entity
 @Table(name = "refresh_tokens")
 @SQLDelete(sql = "Update refresh_tokens SET deleted_at = CURRENT_TIMESTAMP WHERE id=? AND deleted_at IS NULL")

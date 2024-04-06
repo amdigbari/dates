@@ -23,7 +23,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: boolean
+                $ref: '#/components/schemas/HttpResponseBoolean'
   /api/auth/register:
     post:
       tags:
@@ -41,7 +41,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/HttpResponseUser'
   /api/auth/refresh-token:
     post:
       tags:
@@ -59,7 +59,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/RefreshTokenResponseDto'
+                $ref: '#/components/schemas/HttpResponseRefreshTokenResponseDto'
   /api/auth/login:
     post:
       tags:
@@ -77,7 +77,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/LoginResponseDto'
+                $ref: '#/components/schemas/HttpResponseLoginResponseDto'
   /api/users:
     get:
       tags:
@@ -89,9 +89,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/HttpResponseListUser'
   /api/users/{id}:
     get:
       tags:
@@ -110,7 +108,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/HttpResponseUser'
   /api/auth/logout:
     delete:
       tags:
@@ -128,7 +126,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: boolean
+                $ref: '#/components/schemas/HttpResponseBoolean'
 components:
   schemas:
     SendOTPRequestDto:
@@ -138,6 +136,16 @@ components:
       properties:
         email:
           type: string
+    HttpResponseBoolean:
+      required:
+      - data
+      - status
+      type: object
+      properties:
+        data:
+          type: boolean
+        status:
+          type: boolean
     RegisterRequestDto:
       required:
       - email
@@ -151,6 +159,16 @@ components:
           type: string
         password:
           type: string
+    HttpResponseUser:
+      required:
+      - data
+      - status
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/User'
+        status:
+          type: boolean
     User:
       required:
       - email
@@ -178,6 +196,16 @@ components:
       properties:
         token:
           type: string
+    HttpResponseRefreshTokenResponseDto:
+      required:
+      - data
+      - status
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RefreshTokenResponseDto'
+        status:
+          type: boolean
     RefreshTokenResponseDto:
       required:
       - accessToken
@@ -198,6 +226,16 @@ components:
           type: string
         password:
           type: string
+    HttpResponseLoginResponseDto:
+      required:
+      - data
+      - status
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LoginResponseDto'
+        status:
+          type: boolean
     LoginResponseDto:
       required:
       - accessToken
@@ -208,3 +246,15 @@ components:
           type: string
         refreshToken:
           type: string
+    HttpResponseListUser:
+      required:
+      - data
+      - status
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        status:
+          type: boolean

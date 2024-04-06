@@ -8,6 +8,7 @@ import mediaManager.auth.dtos.register.RegisterRequestDto
 import mediaManager.auth.dtos.sendOtp.SendOTPRequestDto
 import mediaManager.exceptions.ExpiredException
 import mediaManager.exceptions.TooManyAttemptsException
+import mediaManager.restAPI.HttpResponse
 import mediaManager.user.User
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -22,21 +23,32 @@ import org.springframework.web.server.ResponseStatusException
 @RestController
 @RequestMapping("/api/auth")
 class AuthenticationController(val authenticationService: AuthenticationService) {
+    @PostMapping("/send-otp")
+    fun sendOtp(
+        @RequestBody request: SendOTPRequestDto,
+    ): ResponseEntity<HttpResponse<Boolean>> {
+        try {
+            authenticationService.sendOTP(request.email)
+        } catch (error: TooManyAttemptsException) {
+            throw ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, error.message)
+        }
+
+        return HttpResponse.ok(true)
+    }
+
     @PostMapping("/login")
     fun login(
         @RequestBody loginRequest: LoginRequestDto,
-    ): LoginResponseDto =
-        authenticationService.login(
-            loginRequest,
-        )
+    ): ResponseEntity<HttpResponse<LoginResponseDto>> = HttpResponse.ok(authenticationService.login(loginRequest))
 
     @PostMapping("/register")
     fun register(
         @RequestBody request: RegisterRequestDto,
 //        TODO: Add validation for fields
-    ): User {
+    ): ResponseEntity<HttpResponse<User>> {
         try {
-            return authenticationService.register(request)
+            val user = authenticationService.register(email = request.email, otp = request.otp, password = request.password)
+            return HttpResponse.created(user)
         } catch (error: ExpiredException) {
             throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "OTP is incorrect or expired!")
         } catch (error: IllegalArgumentException) {
@@ -47,29 +59,22 @@ class AuthenticationController(val authenticationService: AuthenticationService)
     @PostMapping("/refresh-token")
     fun refreshToken(
         @RequestBody request: RefreshTokenRequestDto,
-    ): RefreshTokenResponseDto = authenticationService.refreshAccessToken(request.token).mapToTokenResponse(request.token)
+    ): ResponseEntity<HttpResponse<RefreshTokenResponseDto>> =
+        HttpResponse.ok(authenticationService.refreshAccessToken(request.token).mapToTokenResponse(request.token))
 
     @DeleteMapping("/logout")
     fun logout(
         @RequestHeader("Authorization") authHeader: String,
-    ): ResponseEntity<Boolean> {
+    ): ResponseEntity<HttpResponse<Boolean>> {
         authenticationService.logout(authHeader)
-        return ResponseEntity.ok().build()
+        return HttpResponse.ok(true)
     }
 
-    @PostMapping("/send-otp")
-    fun sendOtp(
-        @RequestBody request: SendOTPRequestDto,
-    ): ResponseEntity<Boolean> {
-        try {
-            authenticationService.sendOTP(request.email)
-        } catch (error: TooManyAttemptsException) {
-            throw ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, error.message)
-        }
-
-        return ResponseEntity.ok().build()
-    }
-
+    /**
+     * Extension function to Generate RefreshTokenDto. Should call on the access token
+     *
+     * @param refreshToken String.
+     */
     private fun String.mapToTokenResponse(refreshToken: String): RefreshTokenResponseDto =
         RefreshTokenResponseDto(
             accessToken = this,
