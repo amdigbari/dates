@@ -1,5 +1,6 @@
 package mediaManager.auth
 
+import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -32,19 +33,21 @@ class JWTAuthenticationFilter(
 
         val jwtToken = TokenUtils.extractTokenValue(authHeader!!)
         val email = tokenService.extractEmail(jwtToken)
-        val isTokenExpired = expiredTokenService.findByToken(jwtToken).isPresent
-
-        if (!isTokenExpired && SecurityContextHolder.getContext().authentication == null) {
-            val foundUser = userDetailsService.loadUserByUsername(email)
-
-            if (tokenService.isValid(jwtToken, foundUser)) {
-                this.updateContext(foundUser, request)
-            }
+        try {
+            expiredTokenService.findByToken(jwtToken)
 
             filterChain.doFilter(request, response)
-        }
+        } catch (exception: EntityNotFoundException) {
+            if (SecurityContextHolder.getContext().authentication == null) {
+                val foundUser = userDetailsService.loadUserByUsername(email)
 
-        filterChain.doFilter(request, response)
+                if (tokenService.isValid(jwtToken, foundUser)) {
+                    this.updateContext(foundUser, request)
+                }
+
+                filterChain.doFilter(request, response)
+            }
+        }
     }
 
     private fun updateContext(

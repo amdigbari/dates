@@ -1,12 +1,20 @@
 package mediaManager.notification.mail
 
 import org.springframework.boot.autoconfigure.mail.MailProperties
+import org.springframework.mail.MailException
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
 
 @Service
 class MailService(val mailSender: JavaMailSender, val mailProperties: MailProperties) {
+    /**
+     * Sends a simple email.
+     *
+     * @param mail Mail.
+     *
+     * @throws MailException
+     */
     fun sendMail(mail: Mail) {
         val message = mailSender.createMimeMessage()
         val helper = MimeMessageHelper(message)

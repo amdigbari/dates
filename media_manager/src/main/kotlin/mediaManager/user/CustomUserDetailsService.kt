@@ -10,6 +10,13 @@ typealias ApplicationUser = mediaManager.user.User
 
 @Service
 class CustomUserDetailsService(private val userRepository: UserRepository) : UserDetailsService {
+    /**
+     * Locates the user based on the username which is email.
+     * @param username the email value of the user.
+     *
+     * @return a fully populated user record (never null)
+     * @throws UsernameNotFoundException in case email address is not found
+     */
     override fun loadUserByUsername(username: String): UserDetails {
         try {
             return userRepository.findByEmail(username).get().mapToUserDetails()
@@ -18,6 +25,11 @@ class CustomUserDetailsService(private val userRepository: UserRepository) : Use
         }
     }
 
+    /**
+     * ApplicationUser extension function to convert ApplicationUser to UserDetails
+     *
+     * @return UserDetails
+     */
     private fun ApplicationUser.mapToUserDetails(): UserDetails =
         User.builder()
             .username(this.email)

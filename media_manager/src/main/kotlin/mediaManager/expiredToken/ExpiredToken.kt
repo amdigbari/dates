@@ -11,6 +11,9 @@ import jakarta.persistence.TemporalType
 import java.sql.Timestamp
 import java.time.Instant
 
+/**
+ * Holds the logged out access tokens that still are not expired.
+ */
 @Entity
 @Table(name = "expired_tokens")
 data class ExpiredToken(
