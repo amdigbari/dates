@@ -16,6 +16,15 @@ const nextConfig = {
     includePaths: [path.resolve(__dirname, 'src', 'theme')],
   },
   reactStrictMode: true,
+
+  async rewrites() {
+    return [
+      {
+        source: '/api/media-manager/:path*',
+        destination: 'http://localhost:8080/:path*',
+      },
+    ];
+  },
 };
 
 export default withBundleAnalyzer(nextTranslate(nextConfig));

@@ -1,0 +1,7 @@
+@import 'helpers';
+
+:export {
+  @each $key, $value in $spacers {
+    spacer_#{$key}: $value;
+  }
+}

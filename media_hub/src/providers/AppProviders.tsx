@@ -2,9 +2,9 @@
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode } from 'react';
-import BootstrapSSRProvider from 'react-bootstrap/SSRProvider';
-import BootstrapThemeProvider from 'react-bootstrap/ThemeProvider';
+import { SSRProvider as BootstrapSSRProvider, ThemeProvider as BootstrapThemeProvider } from 'react-bootstrap';
 
+import { ToastProvider } from 'src/components';
 import { queryClient } from 'src/services';
 
 interface Props {
@@ -14,7 +14,9 @@ export function AppProviders({ children }: Props): ReactNode {
   return (
     <QueryClientProvider client={queryClient}>
       <BootstrapSSRProvider>
-        <BootstrapThemeProvider dir="rtl">{children}</BootstrapThemeProvider>
+        <BootstrapThemeProvider dir="rtl">
+          <ToastProvider>{children}</ToastProvider>
+        </BootstrapThemeProvider>
       </BootstrapSSRProvider>
     </QueryClientProvider>
   );

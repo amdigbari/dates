@@ -3,12 +3,14 @@
 
   "auth": {
     "email": "ایمیل",
-    "password": "رمز عبور",
-    "register": "ثبت‌نام"
+    "password": "رمز ورود",
+    "register": "ثبت نام"
   },
 
   "form-messages": {
     "required": "{{ field }} الزامی می‌باشد",
     "invalid": "فرمت {{ field }} وارد شده صحیح نیست."
-  }
+  },
+
+  "loading": "درحال بارگذاری..."
 }

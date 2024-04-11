@@ -1,0 +1,21 @@
+@function to-snake-case($string) {
+  $snake-case: '';
+  $separators: '/ /_|-|::|\/|\\/';
+  $digits: '1234567890';
+
+  @for $i from 1 through str-length($string) {
+    $char: str-slice($string, $i, $i);
+
+    @if str-index($separators, $char) {
+      $snake-case: $snake-case + '_';
+    } @else if $i == 1 or str-slice($string, $i - 1, $i - 1) == '-' {
+      $snake-case: $snake-case + $char;
+    } @else if to-upper-case($char) == $char and not str-index($digits, $char) {
+      $snake-case: $snake-case + '_' + to-lower-case($char);
+    } @else {
+      $snake-case: $snake-case + to-lower-case($char);
+    }
+  }
+
+  @return $snake-case;
+}

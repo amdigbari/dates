@@ -3,11 +3,11 @@ import createClient, { type ClientMethod, type FetchOptions, type FetchResponse 
 import type { FilterKeys, HttpMethod, PathsWithMethod as PathsWith } from 'openapi-typescript-helpers';
 
 import type { paths as MediaManager } from './.generated/types/media-manager';
-import { type APIServicesCombinedErrors, HttpError, type MediaManagerError } from './api-service-errors';
+import { type APIServicesCombinedErrors, HttpError } from './api-service-errors';
 
 // NOTE: This approach assumes that every backed services will be served via a API Gateway
 // and there will be only one base_url for every service API paths
-const API_BASE_URL = process.env.NEXT_APP_API_BASE_URL || 'http://localhost:8000/api/';
+const API_BASE_URL = process.env.NEXT_APP_API_BASE_URL || 'http://localhost:3000/api/';
 
 type PathGen<BasePath extends string, Paths> = {
   [k in keyof Paths & string as `${BasePath}${k}`]: Paths[k];
@@ -30,7 +30,8 @@ export type HttpResponseData<M extends HttpMethod, P extends HttpPaths<M>> = Non
  * @example getRequestPath('sample:/pets'): 'sample/pets'
  */
 function getRequestPath(path: keyof Paths) {
-  return path.replace(':', '/').replace(/\/\//g, '/');
+  // This is due to openapi-fetch behavior that removes the trailing slash of the base url
+  return `/${path.replace(':', '/')}`.replace(/\/{2,}/g, '/');
 }
 
 const client = createClient<Paths>({
@@ -54,11 +55,15 @@ export async function clientFetch<M extends HttpMethod, P extends HttpPaths<M>>(
         throw new HttpError({ status: false, message: error, status_code: response.status });
       }
 
-      throw new HttpError(error as unknown as APIServicesCombinedErrors);
+      throw new HttpError({ ...error, status_code: response.status } as unknown as APIServicesCombinedErrors);
     }
 
     return data as HttpResponseData<M, P>;
   } catch (error) {
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
     // In case the openapi itself throws an error.
     // Like making request without a network
 

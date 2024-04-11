@@ -1,0 +1,9 @@
+@use 'sass:math';
+
+/// Convert pixel to rem
+/// @param {Number} $px - A number to convert to rem. It has to be a number. If number has a unit, that remove and then convert.
+/// @return {Number} - Converted number that unit is rem
+@function px-to-rem($px) {
+  $number: math.div($px, ($px * 0 + 1));
+  @return #{math.div($number, 16)}rem;
+}
