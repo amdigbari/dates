@@ -1,1 +1,1 @@
-export type * from './globals';
+export * from './form-types';

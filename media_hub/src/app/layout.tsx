@@ -1,7 +1,8 @@
+import 'src/theme/globals.scss';
+
 import type { Metadata } from 'next';
 
 import { AppProviders } from 'src/providers';
-import type { LayoutProps } from 'src/types/globals';
 
 export const metadata: Metadata = {
   title: 'Create Next App',

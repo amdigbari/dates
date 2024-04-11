@@ -137,9 +137,6 @@ components:
         email:
           type: string
     HttpResponseBoolean:
-      required:
-      - data
-      - status
       type: object
       properties:
         data:
@@ -160,9 +157,6 @@ components:
         password:
           type: string
     HttpResponseUser:
-      required:
-      - data
-      - status
       type: object
       properties:
         data:
@@ -170,11 +164,6 @@ components:
         status:
           type: boolean
     User:
-      required:
-      - email
-      - id
-      - password
-      - role
       type: object
       properties:
         id:
@@ -197,9 +186,6 @@ components:
         token:
           type: string
     HttpResponseRefreshTokenResponseDto:
-      required:
-      - data
-      - status
       type: object
       properties:
         data:
@@ -207,9 +193,6 @@ components:
         status:
           type: boolean
     RefreshTokenResponseDto:
-      required:
-      - accessToken
-      - refreshToken
       type: object
       properties:
         accessToken:
@@ -227,9 +210,6 @@ components:
         password:
           type: string
     HttpResponseLoginResponseDto:
-      required:
-      - data
-      - status
       type: object
       properties:
         data:
@@ -237,9 +217,6 @@ components:
         status:
           type: boolean
     LoginResponseDto:
-      required:
-      - accessToken
-      - refreshToken
       type: object
       properties:
         accessToken:
@@ -247,9 +224,6 @@ components:
         refreshToken:
           type: string
     HttpResponseListUser:
-      required:
-      - data
-      - status
       type: object
       properties:
         data:

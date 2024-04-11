@@ -1,8 +1,3 @@
 package mediaManager.exceptions
 
-class TooManyAttemptsException : Exception {
-    constructor() : super()
-    constructor(message: String) : super(message)
-    constructor(message: String, cause: Throwable) : super(message, cause)
-    constructor(cause: Throwable) : super(cause)
-}
+class TooManyAttemptsException(message: String) : Exception(message)

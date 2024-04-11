@@ -1,3 +1,14 @@
 {
-  "hello-world": "سلام مینا!"
+  "hello-world": "سلام مینا!",
+
+  "auth": {
+    "email": "ایمیل",
+    "password": "رمز عبور",
+    "register": "ثبت‌نام"
+  },
+
+  "form-messages": {
+    "required": "{{ field }} الزامی می‌باشد",
+    "invalid": "فرمت {{ field }} وارد شده صحیح نیست."
+  }
 }

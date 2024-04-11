@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/jetbrains,intellij,java,kotlin,gradle,node,yarn,yalc,react,nextjs,cypressio,visualstudiocode,webstorm
-# Edit at https://www.toptal.com/developers/gitignore?templates=jetbrains,intellij,java,kotlin,gradle,node,yarn,yalc,react,nextjs,cypressio,visualstudiocode,webstorm
+# Created by https://www.toptal.com/developers/gitignore/api/jetbrains,intellij,java,kotlin,gradle,node,yarn,yalc,react,turbo,nextjs,cypressio,visualstudiocode,webstorm
+# Edit at https://www.toptal.com/developers/gitignore?templates=jetbrains,intellij,java,kotlin,gradle,node,yarn,yalc,react,turbo,nextjs,cypressio,visualstudiocode,webstorm
 
 ### CypressIO ###
 # gitignore template for the CypressIO, browser test framework
@@ -421,6 +421,10 @@ psd
 thumb
 sketch
 
+### Turbo ###
+# Turborepo task cache
+.turbo
+
 ### VisualStudioCode ###
 .vscode/*
 # !.vscode/settings.json
@@ -566,7 +570,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
-# End of https://www.toptal.com/developers/gitignore/api/jetbrains,intellij,java,kotlin,gradle,node,yarn,yalc,react,nextjs,cypressio,visualstudiocode,webstorm
+# End of https://www.toptal.com/developers/gitignore/api/jetbrains,intellij,java,kotlin,gradle,node,yarn,yalc,react,turbo,nextjs,cypressio,visualstudiocode,webstorm
 
 # Local Files
 *.local

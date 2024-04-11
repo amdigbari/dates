@@ -2,6 +2,7 @@
   "locales": ["fa-IR"],
   "defaultLocale": "fa-IR",
   "pages": {
-    "*": ["common"]
+    "*": ["common"],
+    "/auth/register": ["auth/register"]
   }
 }

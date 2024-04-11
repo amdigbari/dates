@@ -1,13 +1,11 @@
 'use client';
 
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode } from 'react';
+import BootstrapSSRProvider from 'react-bootstrap/SSRProvider';
+import BootstrapThemeProvider from 'react-bootstrap/ThemeProvider';
 
 import { queryClient } from 'src/services';
-import { theme } from 'src/theme';
 
 interface Props {
   children: ReactNode;
@@ -15,13 +13,9 @@ interface Props {
 export function AppProviders({ children }: Props): ReactNode {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-
-          {children}
-        </ThemeProvider>
-      </AppRouterCacheProvider>
+      <BootstrapSSRProvider>
+        <BootstrapThemeProvider dir="rtl">{children}</BootstrapThemeProvider>
+      </BootstrapSSRProvider>
     </QueryClientProvider>
   );
 }

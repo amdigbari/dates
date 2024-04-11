@@ -1,6 +1,15 @@
 package mediaManager.auth.dtos.login
 
-data class LoginRequestDto(
-    val email: String,
-    val password: String,
-)
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+import mediaManager.validations.Password
+
+class LoginRequestDto {
+    @Email
+    @NotBlank
+    val email: String = ""
+
+    @Password
+    @NotBlank
+    val password: String = ""
+}
