@@ -4,7 +4,8 @@
   "auth": {
     "email": "ایمیل",
     "password": "رمز ورود",
-    "register": "ثبت نام"
+    "register": "ثبت نام",
+    "login": "ورود"
   },
 
   "form-messages": {
