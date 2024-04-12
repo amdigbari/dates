@@ -1,5 +1,6 @@
 package mediaManager.user
 
+import mediaManager.exceptions.CustomIllegalArgumentException
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -16,7 +17,7 @@ class UserService(
      * @param password String. Be aware that the return user will have encoded password stored in the database.
      * @param role Role. The role of User which can Be either USER or ADMIN.
      *
-     * @throws IllegalArgumentException in case email exists.
+     * @throws CustomIllegalArgumentException with fieldName="email" in case email exists.
      * @throws OptimisticLockingFailureException when the entity uses optimistic locking and has a version attribute with a different value from that found in the persistence store. Also thrown if the entity is assumed to be present but does not exist in the database.
      */
     fun createUser(
@@ -26,7 +27,7 @@ class UserService(
     ): User {
         try {
             this.findByEmail(email)
-            throw IllegalArgumentException("User already exists!")
+            throw CustomIllegalArgumentException("User already exists!", "email")
         } catch (exception: NoSuchElementException) {
             val user = User(email = email, password = passwordEncoder.encode(password), role = role)
             userRepository.save(user)

@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.security.Keys
+import mediaManager.exceptions.CustomIllegalArgumentException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -49,7 +50,7 @@ class TokenService(jwtProperties: JWTProperties) {
      *
      * @throws UnsupportedJwtException If the JWT argument does not represent a signed Claims JWT.
      * @throws JwtException If the JWT string cannot be parsed or validated as required.
-     * @throws IllegalArgumentException If the JWT string is null or empty or only whitespace.
+     * @throws CustomIllegalArgumentException with fieldName="token", If the JWT string is null or empty or only whitespace.
      */
     fun extractEmail(token: String): String = getAllClaims(token).subject
 
@@ -62,7 +63,7 @@ class TokenService(jwtProperties: JWTProperties) {
      *
      * @throws UnsupportedJwtException If the JWT argument does not represent a signed Claims JWT.
      * @throws JwtException If the JWT string cannot be parsed or validated as required.
-     * @throws IllegalArgumentException If the JWT string is null or empty or only whitespace.
+     * @throws CustomIllegalArgumentException with fieldName="token", If the JWT string is null or empty or only whitespace.
      */
     fun isExpired(token: String): Boolean =
         getAllClaims(token)
@@ -103,12 +104,17 @@ class TokenService(jwtProperties: JWTProperties) {
      *
      * @throws UnsupportedJwtException If the JWT argument does not represent a signed Claims JWT.
      * @throws JwtException If the JWT string cannot be parsed or validated as required.
-     * @throws IllegalArgumentException If the JWT string is null or empty or only whitespace.
+     * @throws CustomIllegalArgumentException with fieldName="token", If the JWT string is null or empty or only whitespace.
      */
-    private fun getAllClaims(token: String): Claims =
-        Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .payload
+    private fun getAllClaims(token: String): Claims {
+        try {
+            return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+        } catch (exception: IllegalArgumentException) {
+            throw CustomIllegalArgumentException("JWT is invalid", "token")
+        }
+    }
 }

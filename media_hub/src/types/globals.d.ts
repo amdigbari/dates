@@ -1,7 +1,3 @@
-/// <reference types="@emotion/react/types/css-prop" />
-import type { SxProps, Theme } from '@mui/material';
-import type { ReactNode } from 'react';
-
 interface PageProps<T extends string = never, U extends string = never> {
   params: { [k in T]: string };
   searchParams: SearchParams<U>;
@@ -9,4 +5,13 @@ interface PageProps<T extends string = never, U extends string = never> {
 
 type LayoutProps<T extends string = void> = Readonly<Record<T | 'children', ReactNode>>;
 
-type MaterialSxProps = SxProps<Theme>;
+// Extracted from ToastProps
+type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light';
+
+interface Toast {
+  id: string;
+  header?: string | null | (() => ReactNode);
+  body: string | (() => NonNullable<ReactNode>);
+  duration?: number;
+  variant: Variant;
+}

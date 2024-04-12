@@ -3,13 +3,13 @@ pre-commit:
   commands:
     media_hub_scripts:
       glob: 'media_hub/*.{js,ts,jsx,tsx,mjs}'
-      run: yarn format {staged_files} && cd media_hub && yarn lint && cd .. && git add .
+      run: yarn format {staged_files} && cd media_hub && yarn lint && cd .. && git add {staged_files}
     media_hub_assets:
       glob: 'media_hub/*.{json,scss,css}'
-      run: yarn format {staged_files} && git add .
+      run: yarn format {staged_files} && git add {staged_files}
     media_manager:
       glob: 'media_manager/**/*.{kt,kts}'
-      run: ktlint --format {staged_files} && ktlint {staged_files} && git add .
+      run: ktlint --format {staged_files} && ktlint {staged_files} && git add {staged_files}
 
 format:
   parallel: true

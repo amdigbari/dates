@@ -2,7 +2,13 @@
   "plugins": ["@trivago/prettier-plugin-sort-imports"],
   "printWidth": 120,
   "singleQuote": true,
-  "importOrder": ["<THIRD_PARTY_MODULES>", "^src/", "^[./]"],
+  "importOrder": [
+    "^(?!.*\\.module)(.+\\.(c|sa|sc)ss)$",
+    "<THIRD_PARTY_MODULES>",
+    "^src/",
+    "^[./]",
+    "^(.+\\.module\\.(c|sa|sc)ss)$"
+  ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true
 }

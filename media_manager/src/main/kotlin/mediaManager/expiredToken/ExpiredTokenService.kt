@@ -1,6 +1,7 @@
 package mediaManager.expiredToken
 
 import mediaManager.auth.JWTProperties
+import mediaManager.exceptions.CustomIllegalArgumentException
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -20,7 +21,7 @@ class ExpiredTokenService(
      *
      * @return ExpiredToken. The saved Entity which is ExpiredToken.
      *
-     * @throws IllegalArgumentException in case email exists.
+     * @throws CustomIllegalArgumentException with fieldName="email" in case email exists.
      * @throws OptimisticLockingFailureException when the entity uses optimistic locking and has a version attribute with a different value from that found in the persistence store. Also thrown if the entity is assumed to be present but does not exist in the database.
      */
     fun save(token: String): ExpiredToken = expiredTokenRepository.save(ExpiredToken(token = token))

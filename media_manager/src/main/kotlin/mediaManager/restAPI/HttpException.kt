@@ -3,9 +3,13 @@ package mediaManager.restAPI
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
+data class UnprocessableEntityFieldError(val fieldName: String, val errors: List<String>)
+
 data class HttpException(
     val message: String,
+    val errors: List<UnprocessableEntityFieldError>? = null,
 ) {
+    // This value should be present on response.
     val status = false
 
     companion object {
@@ -15,8 +19,14 @@ data class HttpException(
         private fun error(
             exception: Exception,
             status: HttpStatus,
-        ): ResponseEntity<HttpException> =
-            ResponseEntity.status(status).body(HttpException(message = exception.message ?: status.reasonPhrase))
+            errors: List<UnprocessableEntityFieldError>? = null,
+        ): ResponseEntity<HttpException> {
+            if (status == HttpStatus.UNPROCESSABLE_ENTITY && errors == null) {
+                throw IllegalArgumentException("The field errors is required when the status is UNPROCESSABLE_ENTITY(422)")
+            }
+
+            return ResponseEntity.status(status).body(HttpException(message = exception.message ?: status.reasonPhrase, errors = errors))
+        }
 
         /**
          * @return ResponseEntity of HttpException with message and status code 401
@@ -34,9 +44,17 @@ data class HttpException(
         fun notFound(exception: Exception): ResponseEntity<HttpException> = error(exception, HttpStatus.NOT_FOUND)
 
         /**
+         * @param exception Any Exception
+         * @param errors This param is required
+         * and must an object with keys as field names with error
+         * and the value of them is the message of the field error
+         *
          * @return ResponseEntity of HttpException with message and status code 422
          */
-        fun unprocessableEntity(exception: Exception): ResponseEntity<HttpException> = error(exception, HttpStatus.UNPROCESSABLE_ENTITY)
+        fun unprocessableEntity(
+            exception: Exception,
+            errors: List<UnprocessableEntityFieldError>,
+        ): ResponseEntity<HttpException> = error(exception = exception, status = HttpStatus.UNPROCESSABLE_ENTITY, errors = errors)
 
         /**
          * @return ResponseEntity of HttpException with message and status code 429

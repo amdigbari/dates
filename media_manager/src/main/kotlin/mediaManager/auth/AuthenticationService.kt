@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.UnsupportedJwtException
 import mediaManager.auth.dtos.login.LoginRequestDto
 import mediaManager.auth.dtos.login.LoginResponseDto
+import mediaManager.exceptions.CustomIllegalArgumentException
 import mediaManager.exceptions.TooManyAttemptsException
 import mediaManager.expiredToken.ExpiredTokenService
 import mediaManager.notification.mail.Mail
@@ -102,7 +103,7 @@ class AuthenticationService(
      * @param otp String.
      * @param password String
      *
-     * @throws IllegalArgumentException in case otp is not valid or email already exists.
+     * @throws CustomIllegalArgumentException with fieldName="otp"||"email", in case otp is not valid or email already exists.
      * @throws OptimisticLockingFailureException when the entity uses optimistic locking and has a version attribute with a different value from that found in the persistence store. Also thrown if the entity is assumed to be present but does not exist in the database.
      */
     fun register(
@@ -110,10 +111,12 @@ class AuthenticationService(
         otp: String,
         password: String,
     ): User {
-        val userOTP = redisService.get(RedisContext.AUTH, getOTPCacheKey(email)) ?: throw IllegalArgumentException("OTP is not valid!")
+        val userOTP =
+            redisService.get(RedisContext.AUTH, getOTPCacheKey(email))
+                ?: throw CustomIllegalArgumentException("OTP is not valid!", "otp")
 
         if (userOTP != otp) {
-            throw IllegalArgumentException("OTP is not valid!")
+            throw CustomIllegalArgumentException("OTP is not valid!", "otp")
         }
         // Deleting the OTP from Redis
         redisService.delete(RedisContext.AUTH, getOTPCacheKey(email))
