@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { StatusCodes } from 'http-status-codes';
 import useTranslation from 'next-translate/useTranslation';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { FormControl, FormGroup, FormLabel, InputGroup } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
@@ -23,7 +23,12 @@ import {
 } from 'src/utils';
 
 import styles from './RegisterForm.module.scss';
-import type { RegisterFormType } from './RegisterFormTypes';
+
+interface RegisterFormType {
+  email: string;
+  password: string;
+  otp: string;
+}
 
 interface Props {
   className?: string;

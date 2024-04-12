@@ -3,6 +3,7 @@
   "defaultLocale": "fa-IR",
   "pages": {
     "*": ["common"],
-    "/auth/register": ["auth/register"]
+    "/auth/register": ["auth/register"],
+    "/auth/login": ["auth/login"]
   }
 }
