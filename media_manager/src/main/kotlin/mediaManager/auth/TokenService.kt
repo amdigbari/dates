@@ -6,12 +6,14 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.security.Keys
 import mediaManager.exceptions.CustomIllegalArgumentException
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.Date
 
 @Service
-class TokenService(jwtProperties: JWTProperties) {
+class TokenService(jwtProperties: JWTProperties, private val messageSource: MessageSource) {
     private val secretKey =
         Keys.hmacShaKeyFor(
             jwtProperties.key.toByteArray(),
@@ -114,7 +116,10 @@ class TokenService(jwtProperties: JWTProperties) {
                 .parseSignedClaims(token)
                 .payload
         } catch (exception: IllegalArgumentException) {
-            throw CustomIllegalArgumentException("JWT is invalid", "token")
+            throw CustomIllegalArgumentException(
+                messageSource.getMessage("auth.invalid-token", null, LocaleContextHolder.getLocale()),
+                "token",
+            )
         }
     }
 }

@@ -4,6 +4,8 @@ import mediaManager.auth.JWTProperties
 import mediaManager.auth.TokenService
 import mediaManager.user.CustomUserDetailsService
 import mediaManager.user.UserService
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.userdetails.UserDetails
@@ -21,6 +23,7 @@ class RefreshTokenService(
     private val userDetailsService: CustomUserDetailsService,
     private val tokenService: TokenService,
     private val jwtProperties: JWTProperties,
+    private val messageSource: MessageSource,
 ) {
     /**
      * Fetch UserDetails based on the JWT token value.
@@ -39,7 +42,11 @@ class RefreshTokenService(
         } catch (exception: UsernameNotFoundException) {
             refreshTokenRepository.deleteByToken(token)
 
-            throw NoSuchElementException("refresh token not exists.")
+            throw NoSuchElementException(
+                messageSource
+                    .getMessage("refresh-token.not-exists", null, LocaleContextHolder.getLocale())
+                    ?: "refresh token not exists.",
+            )
         }
     }
 

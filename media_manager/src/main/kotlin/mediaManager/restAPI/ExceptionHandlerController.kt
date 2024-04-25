@@ -5,6 +5,8 @@ import io.jsonwebtoken.UnsupportedJwtException
 import mediaManager.exceptions.CustomIllegalArgumentException
 import mediaManager.exceptions.CustomMethodArgumentNotValidException
 import mediaManager.exceptions.TooManyAttemptsException
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.ResponseEntity
 import org.springframework.mail.MailException
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import java.time.DateTimeException
 
 @ControllerAdvice
-class ExceptionHandlerController {
+class ExceptionHandlerController(private val messageSource: MessageSource) {
     @ExceptionHandler(
         UnsupportedJwtException::class,
         JwtException::class,
@@ -59,7 +61,13 @@ class ExceptionHandlerController {
             }
 
         return HttpException.unprocessableEntity(
-            CustomMethodArgumentNotValidException(exception.parameter, exception.bindingResult, "Form parse error!"),
+            CustomMethodArgumentNotValidException(
+                exception.parameter,
+                exception.bindingResult,
+                messageSource
+                    .getMessage("rest-api.form-parse-error", null, LocaleContextHolder.getLocale())
+                    ?: "Form parse error!.",
+            ),
             errors,
         )
     }
@@ -71,7 +79,19 @@ class ExceptionHandlerController {
             listOf(
                 UnprocessableEntityFieldError(
                     fieldName = exception.fieldName,
-                    errors = listOf(exception.message ?: "Field is not valid!"),
+                    errors =
+                        listOf(
+                            exception.message
+                                ?: (
+                                    messageSource
+                                        .getMessage(
+                                            "rest-api.invalid-field",
+                                            null,
+                                            LocaleContextHolder.getLocale(),
+                                        )
+                                        ?: "Field is not valid!"
+                                ),
+                        ),
                 ),
             ),
         )
@@ -79,7 +99,11 @@ class ExceptionHandlerController {
     @ExceptionHandler(BadCredentialsException::class)
     fun handleBadCredentialsException(exception: BadCredentialsException): ResponseEntity<HttpException> =
         HttpException.unprocessableEntity(
-            BadCredentialsException("Invalid Credentials"),
+            BadCredentialsException(
+                messageSource
+                    .getMessage("rest-api.invalid-credentials", null, LocaleContextHolder.getLocale())
+                    ?: "Invalid Credentials",
+            ),
             errors = emptyList(),
         )
 

@@ -17,11 +17,4 @@ data class User(
     val email: String,
     @Column(nullable = false)
     val password: String,
-    @Column(nullable = false)
-    val role: Role,
 )
-
-enum class Role {
-    USER,
-    ADMIN,
-}

@@ -1,5 +1,7 @@
 package mediaManager.user
 
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Service
 typealias ApplicationUser = mediaManager.user.User
 
 @Service
-class CustomUserDetailsService(private val userRepository: UserRepository) : UserDetailsService {
+class CustomUserDetailsService(private val userRepository: UserRepository, private val messageSource: MessageSource) : UserDetailsService {
     /**
      * Locates the user based on the username which is email.
      * @param username the email value of the user.
@@ -21,7 +23,9 @@ class CustomUserDetailsService(private val userRepository: UserRepository) : Use
         try {
             return userRepository.findByEmail(username).get().mapToUserDetails()
         } catch (error: NoSuchElementException) {
-            throw UsernameNotFoundException("Not Found!")
+            throw UsernameNotFoundException(
+                messageSource.getMessage("user.email-not-fount", null, LocaleContextHolder.getLocale()) ?: "Email not Found!",
+            )
         }
     }
 
@@ -34,6 +38,5 @@ class CustomUserDetailsService(private val userRepository: UserRepository) : Use
         User.builder()
             .username(this.email)
             .password(this.password)
-            .roles(this.role.name)
             .build()
 }
