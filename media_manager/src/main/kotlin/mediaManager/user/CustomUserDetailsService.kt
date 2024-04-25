@@ -11,7 +11,10 @@ import org.springframework.stereotype.Service
 typealias ApplicationUser = mediaManager.user.User
 
 @Service
-class CustomUserDetailsService(private val userRepository: UserRepository, private val messageSource: MessageSource) : UserDetailsService {
+class CustomUserDetailsService(
+    private val userRepository: UserRepository,
+    private val messageSource: MessageSource,
+) : UserDetailsService {
     /**
      * Locates the user based on the username which is email.
      * @param username the email value of the user.
@@ -24,7 +27,12 @@ class CustomUserDetailsService(private val userRepository: UserRepository, priva
             return userRepository.findByEmail(username).get().mapToUserDetails()
         } catch (error: NoSuchElementException) {
             throw UsernameNotFoundException(
-                messageSource.getMessage("user.email-not-fount", null, LocaleContextHolder.getLocale()) ?: "Email not Found!",
+                messageSource.getMessage(
+                    "user.email-not-fount",
+                    null,
+                    "Email not Found!",
+                    LocaleContextHolder.getLocale(),
+                ),
             )
         }
     }

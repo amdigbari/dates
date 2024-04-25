@@ -4,16 +4,17 @@ import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.UnsupportedJwtException
 import mediaManager.auth.dtos.login.LoginRequestDto
 import mediaManager.auth.dtos.login.LoginResponseDto
+import mediaManager.auth.dtos.register.RegisterRequestDto
 import mediaManager.exceptions.CustomIllegalArgumentException
 import mediaManager.exceptions.TooManyAttemptsException
 import mediaManager.expiredToken.ExpiredTokenService
 import mediaManager.notification.mail.Mail
 import mediaManager.notification.mail.MailService
+import mediaManager.profile.ProfileService
 import mediaManager.redis.RedisContext
 import mediaManager.redis.RedisService
 import mediaManager.refreshToken.RefreshTokenService
 import mediaManager.user.CustomUserDetailsService
-import mediaManager.user.User
 import mediaManager.user.UserService
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
@@ -37,6 +38,7 @@ class AuthenticationService(
     private val userDetailsService: CustomUserDetailsService,
     private val tokenService: TokenService,
     private val userService: UserService,
+    private val profileService: ProfileService,
     private val refreshTokenService: RefreshTokenService,
     private val expiredTokenService: ExpiredTokenService,
     private val redisService: RedisService,
@@ -61,9 +63,10 @@ class AuthenticationService(
                 messageSource.getMessage(
                     "auth.send-otp.try-again",
                     arrayOf(authenticationProperties.otpExpiration),
-                    null,
+                    "Try again in ${authenticationProperties.otpExpiration} seconds!",
                     LocaleContextHolder.getLocale(),
-                ) ?: "Try again in ${authenticationProperties.otpExpiration} seconds!",
+                )
+                    ?: "Try again in ${authenticationProperties.otpExpiration} seconds!",
             )
         }
 
@@ -86,47 +89,18 @@ class AuthenticationService(
     fun login(loginRequest: LoginRequestDto): LoginResponseDto {
         authManager.authenticate(UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password))
 
-        val invalidCredentialsMessage =
-            messageSource.getMessage(
-                "auth.login.incorrect-credentials",
-                null,
-                LocaleContextHolder.getLocale(),
-            ) ?: "Incorrect Email or Password!"
-
-        try {
-            val user = userDetailsService.loadUserByUsername(loginRequest.email)
-
-            val accessToken = generateAccessToken(user)
-            val refreshToken = refreshTokenService.generate(user)
-
-            return LoginResponseDto(
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-            )
-        } catch (error: UsernameNotFoundException) {
-            throw BadCredentialsException(invalidCredentialsMessage)
-        } catch (error: IllegalArgumentException) {
-            throw BadCredentialsException(invalidCredentialsMessage)
-        } catch (error: NoSuchElementException) {
-            throw BadCredentialsException(invalidCredentialsMessage)
-        }
+        return generateLoginResponseDto(loginRequest.email)
     }
 
     /**
      * Registers a new user and checks the otp of it
      *
-     * @param email String.
-     * @param otp String.
-     * @param password String
+     * @param dto RegisterRequestDto. A class including required data to create User and Profile.
      *
      * @throws CustomIllegalArgumentException with fieldName="otp"||"email", in case otp is not valid or email already exists.
      * @throws OptimisticLockingFailureException when the entity uses optimistic locking and has a version attribute with a different value from that found in the persistence store. Also thrown if the entity is assumed to be present but does not exist in the database.
      */
-    fun register(
-        email: String,
-        otp: String,
-        password: String,
-    ): User {
+    fun register(dto: RegisterRequestDto): LoginResponseDto {
         val invalidOTPException =
             CustomIllegalArgumentException(
                 messageSource
@@ -136,16 +110,18 @@ class AuthenticationService(
             )
 
         val userOTP =
-            redisService.get(RedisContext.AUTH, getOTPCacheKey(email))
-                ?: throw invalidOTPException
-
-        if (userOTP != otp) {
+            redisService.get(RedisContext.AUTH, getOTPCacheKey(dto.email)) ?: throw invalidOTPException
+        if (userOTP != dto.otp) {
             throw invalidOTPException
         }
-        // Deleting the OTP from Redis
-        redisService.delete(RedisContext.AUTH, getOTPCacheKey(email))
+//         Deleting the OTP from Redis
+        redisService.delete(RedisContext.AUTH, getOTPCacheKey(dto.email))
 
-        return userService.createUser(email = email, password = password)
+//        Creating User and Profile
+        val user = userService.createUser(email = dto.email, password = dto.password)
+        profileService.createProfile(user = user, fullName = dto.fullName, nickname = dto.nickname)
+
+        return generateLoginResponseDto(user.email)
     }
 
     /**
@@ -202,7 +178,12 @@ class AuthenticationService(
     fun logout(authHeader: String?) {
         val invalidTokenException =
             UnsupportedJwtException(
-                messageSource.getMessage("auth.invalid-token", null, LocaleContextHolder.getLocale()) ?: "Invalid Token!",
+                messageSource.getMessage(
+                    "auth.invalid-token",
+                    null,
+                    "Invalid Token!",
+                    LocaleContextHolder.getLocale(),
+                ),
             )
 
         if (!TokenUtils.isStartWithTokenType(authHeader)) {
@@ -215,6 +196,34 @@ class AuthenticationService(
             expiredTokenService.save(token)
         } catch (exception: IllegalArgumentException) {
             throw invalidTokenException
+        }
+    }
+
+    private fun generateLoginResponseDto(email: String): LoginResponseDto {
+        val invalidCredentialsMessage =
+            messageSource.getMessage(
+                "auth.login.incorrect-credentials",
+                null,
+                "Incorrect Email or Password!",
+                LocaleContextHolder.getLocale(),
+            )
+
+        try {
+            val user = userDetailsService.loadUserByUsername(email)
+
+            val accessToken = generateAccessToken(user)
+            val refreshToken = refreshTokenService.generate(user)
+
+            return LoginResponseDto(
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+            )
+        } catch (error: UsernameNotFoundException) {
+            throw BadCredentialsException(invalidCredentialsMessage)
+        } catch (error: IllegalArgumentException) {
+            throw BadCredentialsException(invalidCredentialsMessage)
+        } catch (error: NoSuchElementException) {
+            throw BadCredentialsException(invalidCredentialsMessage)
         }
     }
 
@@ -254,15 +263,15 @@ class AuthenticationService(
             messageSource.getMessage(
                 "auth.otp-email.subject",
                 arrayOf(applicationContext.applicationName),
-                null,
+                "${applicationContext.applicationName} Email Verification",
                 LocaleContextHolder.getLocale(),
             ) ?: "${applicationContext.applicationName} Email Verification",
         content = "<p>${messageSource.getMessage(
             "auth.otp-email.content",
             arrayOf(otp),
-            null,
+            "Verification Code: $otp",
             LocaleContextHolder.getLocale(),
-        ) ?: "Verification Code: $otp"}</p>",
+        )}</p>",
     )
 
     /**

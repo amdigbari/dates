@@ -53,11 +53,6 @@ class UserService(
     }
 
     /**
-     * Fetch all Users from database.
-     */
-    fun findAll(): MutableList<User> = userRepository.findAll().toMutableList()
-
-    /**
      * Fetch User from database by email.
      *
      * @param email String.

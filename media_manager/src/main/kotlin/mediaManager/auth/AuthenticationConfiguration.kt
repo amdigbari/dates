@@ -3,6 +3,7 @@ package mediaManager.auth
 import mediaManager.user.CustomUserDetailsService
 import mediaManager.user.UserRepository
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -15,9 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 @EnableConfigurationProperties(JWTProperties::class, AuthenticationProperties::class)
-class AuthenticationConfiguration {
+class AuthenticationConfiguration(val messageSource: MessageSource) {
     @Bean
-    fun userDetailsService(userRepository: UserRepository): UserDetailsService = CustomUserDetailsService(userRepository)
+    fun userDetailsService(userRepository: UserRepository): UserDetailsService = CustomUserDetailsService(userRepository, messageSource)
 
     @Bean
     fun encoder(): PasswordEncoder = BCryptPasswordEncoder()

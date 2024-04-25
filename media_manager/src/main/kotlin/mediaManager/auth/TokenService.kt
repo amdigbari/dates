@@ -117,7 +117,13 @@ class TokenService(jwtProperties: JWTProperties, private val messageSource: Mess
                 .payload
         } catch (exception: IllegalArgumentException) {
             throw CustomIllegalArgumentException(
-                messageSource.getMessage("auth.invalid-token", null, LocaleContextHolder.getLocale()),
+                messageSource.getMessage(
+                    "auth.invalid-token",
+                    null,
+                    "Invalid Token!.",
+                    LocaleContextHolder.getLocale(),
+                )
+                    ?: "Invalid Token!.",
                 "token",
             )
         }
