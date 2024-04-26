@@ -9,7 +9,6 @@ import mediaManager.auth.dtos.register.RegisterRequestDto
 import mediaManager.auth.dtos.sendOtp.SendOTPRequestDto
 import mediaManager.exceptions.TooManyAttemptsException
 import mediaManager.restAPI.HttpResponse
-import mediaManager.user.User
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 class AuthenticationController(val authenticationService: AuthenticationService) {
     @PostMapping("/send-otp")
     fun sendOtp(
@@ -44,8 +43,8 @@ class AuthenticationController(val authenticationService: AuthenticationService)
     @PostMapping("/register")
     fun register(
         @Valid @RequestBody request: RegisterRequestDto,
-    ): ResponseEntity<HttpResponse<User>> {
-        val user = authenticationService.register(email = request.email, otp = request.otp, password = request.password)
+    ): ResponseEntity<HttpResponse<LoginResponseDto>> {
+        val user = authenticationService.register(dto = request)
         return HttpResponse.created(user)
     }
 

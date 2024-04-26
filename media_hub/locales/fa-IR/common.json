@@ -10,7 +10,9 @@
 
   "form-messages": {
     "required": "{{ field }} الزامی می‌باشد",
-    "invalid": "فرمت {{ field }} وارد شده صحیح نیست."
+    "invalid": "فرمت {{ field }} وارد شده صحیح نیست.",
+    "min-length": "{{ field }} باید حداقل {{ length }} کاراکتر داشته باشد.",
+    "max-length": "{{ field }} باید حداکثر {{ length }} کاراکتر داشته باشد."
   },
 
   "loading": "درحال بارگذاری..."

@@ -6,7 +6,7 @@ servers:
 - url: http://localhost:8080
   description: Generated server url
 paths:
-  /api/auth/send-otp:
+  /api/v1/auth/send-otp:
     post:
       tags:
       - authentication-controller
@@ -24,7 +24,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/HttpResponseBoolean'
-  /api/auth/register:
+  /api/v1/auth/register:
     post:
       tags:
       - authentication-controller
@@ -41,8 +41,8 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/HttpResponseUser'
-  /api/auth/refresh-token:
+                $ref: '#/components/schemas/HttpResponseLoginResponseDto'
+  /api/v1/auth/refresh-token:
     post:
       tags:
       - authentication-controller
@@ -60,7 +60,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/HttpResponseRefreshTokenResponseDto'
-  /api/auth/login:
+  /api/v1/auth/login:
     post:
       tags:
       - authentication-controller
@@ -78,38 +78,25 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/HttpResponseLoginResponseDto'
-  /api/users:
-    get:
-      tags:
-      - user-controller
-      operationId: list
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/HttpResponseListUser'
-  /api/users/{id}:
+  /api/v1/users/info:
     get:
       tags:
       - user-controller
       operationId: get
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: Authorization
+        in: header
+        required: false
         schema:
-          type: integer
-          format: int64
+          type: string
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/HttpResponseUser'
-  /api/auth/logout:
+                $ref: '#/components/schemas/HttpResponseProfileResponseDto'
+  /api/v1/auth/logout:
     delete:
       tags:
       - authentication-controller
@@ -146,6 +133,7 @@ components:
     RegisterRequestDto:
       required:
       - email
+      - fullName
       - otp
       - password
       type: object
@@ -156,28 +144,24 @@ components:
           type: string
         password:
           type: string
-    HttpResponseUser:
+        fullName:
+          type: string
+        nickname:
+          type: string
+    HttpResponseLoginResponseDto:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/LoginResponseDto'
         status:
           type: boolean
-    User:
+    LoginResponseDto:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-        email:
+        accessToken:
           type: string
-        password:
+        refreshToken:
           type: string
-        role:
-          type: string
-          enum:
-          - USER
-          - ADMIN
     RefreshTokenRequestDto:
       required:
       - token
@@ -209,26 +193,22 @@ components:
           type: string
         password:
           type: string
-    HttpResponseLoginResponseDto:
+    HttpResponseProfileResponseDto:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/LoginResponseDto'
+          $ref: '#/components/schemas/ProfileResponseDto'
         status:
           type: boolean
-    LoginResponseDto:
+    ProfileResponseDto:
       type: object
       properties:
-        accessToken:
+        id:
+          type: integer
+          format: int64
+        email:
           type: string
-        refreshToken:
+        fullName:
           type: string
-    HttpResponseListUser:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-        status:
-          type: boolean
+        nickname:
+          type: string

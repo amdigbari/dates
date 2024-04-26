@@ -4,19 +4,21 @@ import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.UnsupportedJwtException
 import mediaManager.auth.dtos.login.LoginRequestDto
 import mediaManager.auth.dtos.login.LoginResponseDto
+import mediaManager.auth.dtos.register.RegisterRequestDto
 import mediaManager.exceptions.CustomIllegalArgumentException
 import mediaManager.exceptions.TooManyAttemptsException
 import mediaManager.expiredToken.ExpiredTokenService
 import mediaManager.notification.mail.Mail
 import mediaManager.notification.mail.MailService
+import mediaManager.profile.ProfileService
 import mediaManager.redis.RedisContext
 import mediaManager.redis.RedisService
 import mediaManager.refreshToken.RefreshTokenService
 import mediaManager.user.CustomUserDetailsService
-import mediaManager.user.Role
-import mediaManager.user.User
 import mediaManager.user.UserService
 import org.springframework.context.ApplicationContext
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.mail.MailException
 import org.springframework.security.authentication.AuthenticationManager
@@ -36,6 +38,7 @@ class AuthenticationService(
     private val userDetailsService: CustomUserDetailsService,
     private val tokenService: TokenService,
     private val userService: UserService,
+    private val profileService: ProfileService,
     private val refreshTokenService: RefreshTokenService,
     private val expiredTokenService: ExpiredTokenService,
     private val redisService: RedisService,
@@ -43,6 +46,7 @@ class AuthenticationService(
     private val jwtProperties: JWTProperties,
     private val authenticationProperties: AuthenticationProperties,
     private val applicationContext: ApplicationContext,
+    private val messageSource: MessageSource,
 ) {
     /**
      * Sending Otp via the mail service and cache in the redis
@@ -55,7 +59,15 @@ class AuthenticationService(
     fun sendOTP(email: String) {
         val oldOTP = redisService.get(RedisContext.AUTH, getOTPCacheKey(email))
         if (oldOTP != null) {
-            throw TooManyAttemptsException("Try again in ${authenticationProperties.otpExpiration} seconds!")
+            throw TooManyAttemptsException(
+                messageSource.getMessage(
+                    "auth.send-otp.try-again",
+                    arrayOf(authenticationProperties.otpExpiration),
+                    "Try again in ${authenticationProperties.otpExpiration} seconds!",
+                    LocaleContextHolder.getLocale(),
+                )
+                    ?: "Try again in ${authenticationProperties.otpExpiration} seconds!",
+            )
         }
 
         val otp = generateOTP()
@@ -77,51 +89,39 @@ class AuthenticationService(
     fun login(loginRequest: LoginRequestDto): LoginResponseDto {
         authManager.authenticate(UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password))
 
-        try {
-            val user = userDetailsService.loadUserByUsername(loginRequest.email)
-
-            val accessToken = generateAccessToken(user)
-            val refreshToken = refreshTokenService.generate(user)
-
-            return LoginResponseDto(
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-            )
-        } catch (error: UsernameNotFoundException) {
-            throw BadCredentialsException("Incorrect Email or Password!")
-        } catch (error: IllegalArgumentException) {
-            throw BadCredentialsException("Incorrect Email or Password!")
-        } catch (error: NoSuchElementException) {
-            throw BadCredentialsException("Incorrect Email or Password!")
-        }
+        return generateLoginResponseDto(loginRequest.email)
     }
 
     /**
      * Registers a new user and checks the otp of it
      *
-     * @param email String.
-     * @param otp String.
-     * @param password String
+     * @param dto RegisterRequestDto. A class including required data to create User and Profile.
      *
      * @throws CustomIllegalArgumentException with fieldName="otp"||"email", in case otp is not valid or email already exists.
      * @throws OptimisticLockingFailureException when the entity uses optimistic locking and has a version attribute with a different value from that found in the persistence store. Also thrown if the entity is assumed to be present but does not exist in the database.
      */
-    fun register(
-        email: String,
-        otp: String,
-        password: String,
-    ): User {
+    fun register(dto: RegisterRequestDto): LoginResponseDto {
+        val invalidOTPException =
+            CustomIllegalArgumentException(
+                messageSource
+                    .getMessage("auth.register.invalid-otp", null, LocaleContextHolder.getLocale())
+                    ?: "OTP is not valid!.",
+                "otp",
+            )
+
         val userOTP =
-            redisService.get(RedisContext.AUTH, getOTPCacheKey(email))
-                ?: throw CustomIllegalArgumentException("OTP is not valid!", "otp")
-
-        if (userOTP != otp) {
-            throw CustomIllegalArgumentException("OTP is not valid!", "otp")
+            redisService.get(RedisContext.AUTH, getOTPCacheKey(dto.email)) ?: throw invalidOTPException
+        if (userOTP != dto.otp) {
+            throw invalidOTPException
         }
-        // Deleting the OTP from Redis
-        redisService.delete(RedisContext.AUTH, getOTPCacheKey(email))
+//         Deleting the OTP from Redis
+        redisService.delete(RedisContext.AUTH, getOTPCacheKey(dto.email))
 
-        return userService.createUser(email = email, password = password, role = Role.USER)
+//        Creating User and Profile
+        val user = userService.createUser(email = dto.email, password = dto.password)
+        profileService.createProfile(user = user, fullName = dto.fullName, nickname = dto.nickname)
+
+        return generateLoginResponseDto(user.email)
     }
 
     /**
@@ -134,6 +134,13 @@ class AuthenticationService(
      * @throws UnsupportedJwtException If the JWT string is not valid.
      */
     fun refreshAccessToken(token: String): String {
+        val invalidRefreshTokenException =
+            UnsupportedJwtException(
+                messageSource
+                    .getMessage("auth.refresh-token.invalid-refresh-token", null, LocaleContextHolder.getLocale())
+                    ?: "Invalid refresh token!.",
+            )
+
         try {
             val extractedEmail = tokenService.extractEmail(token)
 
@@ -144,19 +151,19 @@ class AuthenticationService(
                 if (!tokenService.isExpired(token) && currentUserDetails.username == refreshTokenUserDetails.username) {
                     generateAccessToken(currentUserDetails)
                 } else {
-                    throw UnsupportedJwtException("Invalid refresh token!")
+                    throw invalidRefreshTokenException
                 }
             }
         } catch (exception: UnsupportedJwtException) {
-            throw UnsupportedJwtException("Invalid refresh token!")
+            throw invalidRefreshTokenException
         } catch (exception: JwtException) {
-            throw UnsupportedJwtException("Invalid refresh token!")
+            throw invalidRefreshTokenException
         } catch (exception: UsernameNotFoundException) {
-            throw UnsupportedJwtException("Invalid refresh token!")
+            throw invalidRefreshTokenException
         } catch (exception: NoSuchElementException) {
-            throw UnsupportedJwtException("Invalid refresh token!")
+            throw invalidRefreshTokenException
         } catch (exception: IllegalArgumentException) {
-            throw UnsupportedJwtException("Invalid refresh token!")
+            throw invalidRefreshTokenException
         }
     }
 
@@ -169,8 +176,18 @@ class AuthenticationService(
      * @throws OptimisticLockingFailureException when the entity uses optimistic locking and has a version attribute with a different value from that found in the persistence store. Also thrown if the entity is assumed to be present but does not exist in the database.
      */
     fun logout(authHeader: String?) {
+        val invalidTokenException =
+            UnsupportedJwtException(
+                messageSource.getMessage(
+                    "auth.invalid-token",
+                    null,
+                    "Invalid Token!",
+                    LocaleContextHolder.getLocale(),
+                ),
+            )
+
         if (!TokenUtils.isStartWithTokenType(authHeader)) {
-            throw UnsupportedJwtException("Invalid Token!")
+            throw invalidTokenException
         }
 
         val token = TokenUtils.extractTokenValue(authHeader!!)
@@ -178,7 +195,35 @@ class AuthenticationService(
         try {
             expiredTokenService.save(token)
         } catch (exception: IllegalArgumentException) {
-            throw UnsupportedJwtException("Invalid Token!")
+            throw invalidTokenException
+        }
+    }
+
+    private fun generateLoginResponseDto(email: String): LoginResponseDto {
+        val invalidCredentialsMessage =
+            messageSource.getMessage(
+                "auth.login.incorrect-credentials",
+                null,
+                "Incorrect Email or Password!",
+                LocaleContextHolder.getLocale(),
+            )
+
+        try {
+            val user = userDetailsService.loadUserByUsername(email)
+
+            val accessToken = generateAccessToken(user)
+            val refreshToken = refreshTokenService.generate(user)
+
+            return LoginResponseDto(
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+            )
+        } catch (error: UsernameNotFoundException) {
+            throw BadCredentialsException(invalidCredentialsMessage)
+        } catch (error: IllegalArgumentException) {
+            throw BadCredentialsException(invalidCredentialsMessage)
+        } catch (error: NoSuchElementException) {
+            throw BadCredentialsException(invalidCredentialsMessage)
         }
     }
 
@@ -214,8 +259,19 @@ class AuthenticationService(
         otp: String,
     ) = Mail(
         to = email,
-        subject = "${applicationContext.applicationName} Email Verification",
-        content = "<p>Verification Code: $otp</p>",
+        subject =
+            messageSource.getMessage(
+                "auth.otp-email.subject",
+                arrayOf(applicationContext.applicationName),
+                "${applicationContext.applicationName} Email Verification",
+                LocaleContextHolder.getLocale(),
+            ) ?: "${applicationContext.applicationName} Email Verification",
+        content = "<p>${messageSource.getMessage(
+            "auth.otp-email.content",
+            arrayOf(otp),
+            "Verification Code: $otp",
+            LocaleContextHolder.getLocale(),
+        )}</p>",
     )
 
     /**

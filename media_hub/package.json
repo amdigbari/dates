@@ -13,7 +13,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write '**/*.{js,ts,jsx,tsx,json,scss,css,mjs}'",
-    "generate-openapi-ts": "openapi-typescript ../media_manager/api_spec/docs.yaml -o ./src/services/.generated/types/media-manager.d.ts"
+    "generate-openapi-ts": "openapi-typescript ../media_manager/api_spec/docs.yaml -o ./src/shared/services/.generated/types/media-manager.d.ts"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",

@@ -12,7 +12,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfiguration(private val authenticationProvider: AuthenticationProvider) {
+class SecurityConfiguration(
+    private val authenticationProvider: AuthenticationProvider,
+) {
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
@@ -23,10 +25,8 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
             .authorizeHttpRequests {
                 it.requestMatchers(HttpMethod.GET, "/error", "/api/schema/**")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/auth/**")
+                    .requestMatchers(HttpMethod.POST, "/api/v1/auth/**")
                     .permitAll()
-                    .requestMatchers("/api/users**")
-                    .hasRole("ADMIN")
                     .anyRequest()
                     .fullyAuthenticated()
             }

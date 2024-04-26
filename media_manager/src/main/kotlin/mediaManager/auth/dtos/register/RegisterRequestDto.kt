@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import mediaManager.validations.OTP
 import mediaManager.validations.Password
+import org.hibernate.validator.constraints.Length
 
 class RegisterRequestDto {
     @Email
@@ -17,4 +18,11 @@ class RegisterRequestDto {
     @Password
     @NotBlank
     val password: String = ""
+
+    @NotBlank
+    @Length(min = 5, max = 64)
+    val fullName: String = ""
+
+    @Length(min = 3, max = 32)
+    val nickname: String? = null
 }

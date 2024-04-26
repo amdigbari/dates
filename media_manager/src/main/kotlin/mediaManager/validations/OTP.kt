@@ -35,7 +35,7 @@ class OTPValidator(authenticationProperties: AuthenticationProperties) : Constra
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [OTPValidator::class])
 annotation class OTP(
-    val message: String = "Invalid OTP Format",
+    val message: String = "Invalid OTP Format!.",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = [],
 )
