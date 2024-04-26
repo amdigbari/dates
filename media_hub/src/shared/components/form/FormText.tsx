@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { FormText as BootstrapFormText } from 'react-bootstrap';
 
-import { FieldState } from 'src/types';
+import { FieldState } from 'src/shared/types';
 
 interface Props {
   text: string;

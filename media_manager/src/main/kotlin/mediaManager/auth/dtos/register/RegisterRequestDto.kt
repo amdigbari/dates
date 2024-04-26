@@ -23,6 +23,6 @@ class RegisterRequestDto {
     @Length(min = 5, max = 64)
     val fullName: String = ""
 
-    @Length(min = 5, max = 32)
+    @Length(min = 3, max = 32)
     val nickname: String? = null
 }

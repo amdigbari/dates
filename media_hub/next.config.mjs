@@ -13,7 +13,7 @@ const withBundleAnalyzer = NextBundleAnalyzer({
 const nextConfig = {
   output: 'standalone',
   sassOptions: {
-    includePaths: [path.resolve(__dirname, 'src', 'theme')],
+    includePaths: [path.resolve(__dirname, 'src', 'shared', 'theme')],
   },
   reactStrictMode: true,
 

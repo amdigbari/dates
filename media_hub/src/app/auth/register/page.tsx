@@ -1,6 +1,6 @@
 import useTranslation from 'next-translate/useTranslation';
 
-import { RegisterForm } from 'src/components';
+import { RegisterForm } from './Form';
 
 export default function Register() {
   const { t } = useTranslation('common');

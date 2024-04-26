@@ -1,6 +1,6 @@
 import useTranslation from 'next-translate/useTranslation';
 
-import { LoginForm } from 'src/components';
+import { LoginForm } from './Form';
 
 export default function Login() {
   const { t } = useTranslation('common');

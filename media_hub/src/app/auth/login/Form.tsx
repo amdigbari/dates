@@ -7,9 +7,9 @@ import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
-import { Button, Form, FormInput, type FormProps } from 'src/components';
-import { HttpError, MediaManagerError, mutateService } from 'src/services';
-import { emailPattern, passwordPattern, useToast } from 'src/utils';
+import { Button, Form, FormInput, type FormProps } from 'src/shared/components';
+import { HttpError, MediaManagerError, mutateService } from 'src/shared/services';
+import { emailPattern, passwordPattern, useToast } from 'src/shared/utils';
 
 interface LoginFormType {
   email: string;
@@ -29,7 +29,7 @@ export function LoginForm({ className }: Props) {
   const methods = useForm<LoginFormType>({ mode: 'onTouched', defaultValues: { email: '', password: '' } });
 
   const { mutateAsync: loginRequest, isPending: loginLoading } = useMutation(
-    mutateService('post', 'media-manager:/api/auth/login'),
+    mutateService('post', 'media-manager:/api/v1/auth/login'),
   );
   async function onFormSubmit(...[values]: Parameters<FormProps<LoginFormType>['onSubmit']>) {
     try {

@@ -1,6 +1,7 @@
-@import '~bootstrap/dist/css/bootstrap.rtl.min.css';
+@import '~bootstrap/dist/css/bootstrap.rtl.css';
 @import '~bootstrap-icons';
 @import '~modern-normalize';
+@import './helpers';
 @import './bootstrap-overrides';
 
 * {
@@ -18,4 +19,8 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.no-scroll {
+  @include no-scroll;
 }

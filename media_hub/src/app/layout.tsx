@@ -1,8 +1,8 @@
-import 'src/theme/globals.scss';
+import 'src/shared/theme/globals.scss';
 
 import type { Metadata } from 'next';
 
-import { AppProviders } from 'src/providers';
+import { AppProviders } from 'src/shared/providers';
 
 export const metadata: Metadata = {
   title: 'Blufie Dates',

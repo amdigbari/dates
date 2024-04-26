@@ -3,7 +3,9 @@
 .container {
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow: auto;
+
+  @include no-scroll;
 }
 
 .graphics-wrapper {
@@ -28,9 +30,7 @@
 .children-wrapper {
   background-color: $body-bg;
   width: 50%; // 360px
-  height: 100%;
   margin-right: auto;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,8 +38,6 @@
   &_children {
     width: 25rem; // 400px
     max-width: 100%;
-    max-height: 100%;
     padding: map-get($spacers, 4);
-    overflow: hidden;
   }
 }
