@@ -2,7 +2,7 @@ package mediaManager.auth.dtos.refreshToken
 
 import jakarta.validation.constraints.NotEmpty
 
-class RefreshTokenRequestDto {
-    @NotEmpty
-    val token: String = ""
-}
+data class RefreshTokenRequestDto(
+    @field:NotEmpty
+    val token: String = "",
+)

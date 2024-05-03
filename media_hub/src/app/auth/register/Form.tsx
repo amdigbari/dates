@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import { Button, Form, FormInput, type FormProps, FormText } from 'src/shared/components';
 import { HttpError, MediaManagerError, mutateService } from 'src/shared/services';
 import {
+  TokenStorage,
   emailPattern,
   getCountdownTimeFromSeconds,
   getValidatedPasswordRules,
@@ -74,7 +75,7 @@ export function RegisterForm({ className }: Props) {
       } catch (error) {
         if (error instanceof HttpError) {
           const _errorInfo = error.info as MediaManagerError;
-          if (_errorInfo.status_code === StatusCodes.UNPROCESSABLE_ENTITY) {
+          if (_errorInfo.status_code === StatusCodes.UNPROCESSABLE_ENTITY && _errorInfo.errors.length) {
             _errorInfo.errors.forEach((e) => {
               methods.setError(e.fieldName as keyof RegisterFormType, { message: e.errors.join('. ') });
             });
@@ -93,14 +94,17 @@ export function RegisterForm({ className }: Props) {
     try {
       const response = await registerRequest({ body: omit(['confirmPassword'], values) });
 
-      if (response.status) {
+      if (response.status && response.data) {
+        response.data.accessToken && TokenStorage.set('access-token', response.data.accessToken);
+        response.data.refreshToken && TokenStorage.set('refresh-token', response.data.refreshToken);
+
         showToast({ body: t('auth/register:register-successfully'), variant: 'success' });
         router.push('/');
       }
     } catch (error) {
       if (error instanceof HttpError) {
         const _errorInfo = error.info as MediaManagerError;
-        if (_errorInfo.status_code === StatusCodes.UNPROCESSABLE_ENTITY) {
+        if (_errorInfo.status_code === StatusCodes.UNPROCESSABLE_ENTITY && _errorInfo.errors.length) {
           _errorInfo.errors.forEach((e) => {
             methods.setError(e.fieldName as keyof RegisterFormType, { message: e.errors.join('. ') });
           });

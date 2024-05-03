@@ -1,11 +1,16 @@
 package mediaManager.restAPI
 
+import jakarta.validation.constraints.AssertTrue
+import jakarta.validation.constraints.NotNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
 data class HttpResponse<T : Any>(
+    @field:NotNull
     val data: T,
 ) {
+    @field:NotNull
+    @field:AssertTrue
     val status = true
 
     companion object {

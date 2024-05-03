@@ -1,12 +1,34 @@
-@import '~bootstrap/dist/css/bootstrap.rtl.css';
-@import '~bootstrap-icons';
-@import '~modern-normalize';
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons';
+@import 'modern-normalize';
 @import './helpers';
-@import './bootstrap-overrides';
 
 * {
   box-sizing: border-box;
   padding: 0;
+  margin: 0;
+}
+
+h6,
+.h6,
+h5,
+.h5,
+h4,
+.h4,
+h3,
+.h3,
+h2,
+.h2,
+h1,
+.h1 {
+  margin-bottom: 0;
+}
+
+p {
+  margin: 0;
+}
+
+hr {
   margin: 0;
 }
 

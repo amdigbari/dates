@@ -1,15 +1,21 @@
 package mediaManager.restAPI
 
+import jakarta.validation.constraints.AssertFalse
+import jakarta.validation.constraints.NotNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
 data class UnprocessableEntityFieldError(val fieldName: String, val errors: List<String>)
 
 data class HttpException(
+    @field:NotNull
     val message: String,
+    @field:NotNull
     val errors: List<UnprocessableEntityFieldError>? = null,
 ) {
     // This value should be present on response.
+    @field:NotNull
+    @field:AssertFalse
     val status = false
 
     companion object {

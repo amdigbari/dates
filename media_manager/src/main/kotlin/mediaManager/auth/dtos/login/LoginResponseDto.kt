@@ -1,6 +1,10 @@
 package mediaManager.auth.dtos.login
 
+import jakarta.validation.constraints.NotNull
+
 data class LoginResponseDto(
-    val accessToken: String,
-    val refreshToken: String,
+    @field:NotNull
+    val accessToken: String = "",
+    @field:NotNull
+    val refreshToken: String = "",
 )

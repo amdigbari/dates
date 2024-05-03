@@ -4,12 +4,11 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import mediaManager.validations.Password
 
-class LoginRequestDto {
-    @Email
-    @NotBlank
-    val email: String = ""
-
-    @Password
-    @NotBlank
-    val password: String = ""
-}
+data class LoginRequestDto(
+    @field:Email
+    @field:NotBlank
+    val email: String = "",
+    @field:Password
+    @field:NotBlank
+    val password: String = "",
+)

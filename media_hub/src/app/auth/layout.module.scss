@@ -28,12 +28,13 @@
 }
 
 .children-wrapper {
-  background-color: $body-bg;
-  width: 50%; // 360px
+  width: 50%;
+  min-height: 100%;
   margin-right: auto;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: $body-bg;
 
   &_children {
     width: 25rem; // 400px
