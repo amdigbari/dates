@@ -42,7 +42,7 @@ export function LoginForm({ className }: Props) {
     } catch (error) {
       if (error instanceof HttpError) {
         const _errorInfo = error.info as MediaManagerError;
-        if (_errorInfo.status_code === StatusCodes.UNPROCESSABLE_ENTITY) {
+        if (_errorInfo.status_code === StatusCodes.UNPROCESSABLE_ENTITY && _errorInfo.errors.length) {
           _errorInfo.errors.forEach((e) => {
             methods.setError(e.fieldName as keyof LoginFormType, { message: e.errors.join('. ') });
           });

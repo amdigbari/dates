@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import { useContext, useEffect } from 'react';
-import { Toast, ToastBody, ToastHeader } from 'react-bootstrap';
+import { Toast as BootstrapToast, ToastBody, ToastHeader } from 'react-bootstrap';
 
 import { TOAST_DEFAULT_DURATION } from './ToastConstants';
-import { ToastContext } from './ToastContext';
+import { type Toast, ToastContext } from './ToastContext';
 
 interface Props {
   toast: Toast;
@@ -23,12 +23,12 @@ export function ToastItem(props: Props) {
   }, []);
 
   return (
-    <Toast bg={variant} className="d-block my-1">
+    <BootstrapToast bg={variant} className="d-block my-1">
       {!!header && <ToastHeader>{typeof header === 'function' ? header() : <strong>{header}</strong>}</ToastHeader>}
 
       <ToastBody className={clsx({ 'text-white': variant === 'dark' })}>
         {typeof body === 'function' ? body() : <p>{body}</p>}
       </ToastBody>
-    </Toast>
+    </BootstrapToast>
   );
 }

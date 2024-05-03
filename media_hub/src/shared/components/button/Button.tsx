@@ -5,9 +5,9 @@ import { Button as BootstrapButton, type ButtonProps as BootstrapButtonProps, Sp
 export interface ButtonProps extends Omit<BootstrapButtonProps, 'children' | 'variant'> {
   loading?: boolean;
   children: NonNullable<BootstrapButtonProps['children']>;
-  spinnerVariant?: Variant;
+  spinnerVariant?: ColorVariant;
   variant:
-    | Variant
+    | ColorVariant
     | 'link'
     | 'outline-primary'
     | 'outline-secondary'
@@ -24,7 +24,7 @@ export const Button = forwardRef(function ForwardedRefButton(
 ) {
   const { t } = useTranslation();
 
-  const spinnerFinalVariant = useMemo<Variant>(() => {
+  const spinnerFinalVariant = useMemo<ColorVariant>(() => {
     if (spinnerVariant) {
       return spinnerVariant;
     }
@@ -34,7 +34,7 @@ export const Button = forwardRef(function ForwardedRefButton(
     }
 
     if (buttonVariant.startsWith('outline')) {
-      return buttonVariant.replace('outline-', '') as Variant;
+      return buttonVariant.replace('outline-', '') as ColorVariant;
     }
 
     if (buttonVariant === 'link') {

@@ -5,7 +5,7 @@ import { ToastContainer as BootstrapToastContainer } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 
 import { TOAST_MAX_SIZE } from './ToastConstants';
-import { ToastContext, ToastContextType } from './ToastContext';
+import { type Toast, ToastContext, type ToastContextType } from './ToastContext';
 import { ToastItem } from './ToastItem';
 
 type Props = Readonly<Record<'children', ReactNode>>;
@@ -30,7 +30,7 @@ export function ToastProvider({ children }: Props) {
     <ToastContext.Provider value={setterValue}>
       {children}
 
-      <BootstrapToastContainer position="bottom-start">
+      <BootstrapToastContainer position="bottom-start" className="mb-4 ms-4">
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} />
         ))}

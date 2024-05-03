@@ -1,5 +1,6 @@
 package mediaManager.restAPI
 
+import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.UnsupportedJwtException
 import mediaManager.exceptions.CustomIllegalArgumentException
@@ -25,8 +26,9 @@ class ExceptionHandlerController(private val messageSource: MessageSource) {
     @ExceptionHandler(
         UnsupportedJwtException::class,
         JwtException::class,
+        ExpiredJwtException::class,
     )
-    fun handleUnauthorizedException(exception: DisabledException): ResponseEntity<HttpException> = HttpException.unauthorized(exception)
+    fun handleUnauthorizedException(exception: Exception): ResponseEntity<HttpException> = HttpException.unauthorized(exception)
 
     @ExceptionHandler(
         DisabledException::class,
