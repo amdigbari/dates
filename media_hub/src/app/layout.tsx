@@ -1,8 +1,10 @@
 import 'src/shared/theme/globals.scss';
 
+import clsx from 'clsx';
 import type { Metadata } from 'next';
 
 import { AppProviders } from 'src/shared/providers';
+import { iranSansXFont } from 'src/shared/theme';
 
 export const metadata: Metadata = {
   title: 'Blufie Dates',
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps) {
   return (
-    <html dir="rtl" lang="fa">
+    <html dir="rtl" lang="fa" className={clsx(iranSansXFont.className, iranSansXFont.variable)}>
       <body>
         <AppProviders>{children}</AppProviders>
       </body>
