@@ -12,7 +12,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write '**/*.{js,ts,jsx,tsx,json,scss,css,mjs}'",
+    "pre-run": "yarn generate-openapi-ts",
     "generate-openapi-ts": "openapi-typescript ../media_manager/api_spec/docs.yaml -o ./src/shared/services/.generated/types/media-manager.d.ts"
   },
   "dependencies": {
