@@ -1,0 +1,25 @@
+@import 'bootstrap/scss/mixins/breakpoints';
+
+@mixin media-desktop {
+  @include media-breakpoint-up(lg) {
+    @content;
+  }
+}
+
+@mixin media-mobile-and-tablet {
+  @include media-breakpoint-down(md) {
+    @content;
+  }
+}
+
+@mixin media-mobile {
+  @include media-breakpoint-down(xs) {
+    @content;
+  }
+}
+
+@mixin media-tablet {
+  @include media-breakpoint-between(sm, md) {
+    @content;
+  }
+}
