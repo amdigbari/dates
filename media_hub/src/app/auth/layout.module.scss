@@ -29,13 +29,12 @@
   &_overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, $body-bg 50%, rgba($body-bg, 0.4) 65%, transparent 80%);
+    background: linear-gradient(to left, $body-bg 50%, rgba($body-bg, 0.4) 65%, transparent 80%);
     pointer-events: none;
     z-index: 2;
 
     @include media-mobile-and-tablet {
-      background: linear-gradient(to top, $body-bg 0%, rgba($body-bg, 0.4) 15%, transparent 50%);
-      // display: none;
+      background: linear-gradient(to top, $body-bg 0%, rgba($body-bg, 0.4) 15%, transparent 50%) !important;
     }
   }
 }
@@ -43,7 +42,7 @@
 .children-wrapper {
   width: 50%;
   min-height: 100%;
-  margin-right: auto;
+  margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,7 +51,7 @@
   @include media-mobile-and-tablet {
     width: 100%;
     min-height: unset;
-    margin-right: 0;
+    margin-left: 0;
     margin-top: map-get($spacers, 3);
   }
 
