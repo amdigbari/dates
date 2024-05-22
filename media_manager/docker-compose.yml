@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        APPLICATION_NAME: ${APPLICATION_NAME:-Dates}
+
+        DB_HOST: ${DB_HOST:-host.docker.internal}
+        DB_PORT: ${DB_PORT:-13306}
+        DB_NAME: ${DB_NAME:-dates}
+        DB_USERNAME: ${DB_USERNAME:-dates}
+        DB_PASSWORD: ${DB_PASSWORD:-123456}
+
+        JWT_KEY: ${JWT_KEY:-up65tUz!3zLT7y*Xaok!ZFJCQnCAmb8M8h3Dy%E6swTXRt&TjeygD8zKdRb9yS}
+
+        MAIL_USERNAME: ${MAIL_USERNAME}
+        MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+        REDIS_HOST: ${REDIS_HOST:-redis}
+        REDIS_PORT: ${REDIS_PORT:-16379}
+        REDIS_PASSWORD: ${REDIS_PASSWORD:-123456}
+
+        DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-fa}
+        DEFAULT_COUNTRY: ${DEFAULT_COUNTRY:-IR}
+
+        S3_ENDPOINT: ${S3_ENDPOINT:-http://localhost:9000}
+        S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+        S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+        S3_BUCKET_NAME: ${S3_BUCKET_NAME:-media-manager}
+    ports:
+      - '${APP_PORT:-8080}:8080'
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - .:/app
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-dates}
+      MYSQL_USER: ${DB_USERNAME:-dates}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-123456}
+    volumes:
+      - database_data:/var/lib/mysql
+    ports:
+      - ${DB_PORT:-13306}:3306
+
+  redis:
+    image: redis:latest
+    command: --appendonly yes --requirepass ${REDIS_PASSWORD:-123456}
+    volumes:
+      - redis_data:/data
+    ports:
+      - ${REDIS_PORT:-16379}:6379
+
+  miniostorage:
+    image: minio/minio
+    entrypoint: sh
+    command: -c 'mkdir -p /data/${S3_BUCKET_NAME:-media-manager} && minio  server /data --console-address  ":9090"'
+    environment:
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_KEY:-minioadmin}
+    ports:
+      - '9090:9090'
+      - '${S3_PORT:-9000}:9000'
+    volumes:
+      - miniostorage:/data
+
+  minioinitializer:
+    image: minio/mc
+    entrypoint: sh
+    command: -c "mc alias set miniostorage ${S3_ENDPOINT:-http://localhost:9000} ${S3_ACCESS_KEY:-minioadmin} ${S3_SECRET_KEY:-minioadmin} && mc mb miniostorage/${S3_BUCKET_NAME:-media-manager}; mc anonymous set download miniostorage/${S3_BUCKET_NAME:-media-manager};"
+    depends_on:
+      - miniostorage
+
+volumes:
+  database_data:
+  redis_data:
+  miniostorage:
