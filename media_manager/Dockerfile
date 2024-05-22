@@ -1,0 +1,70 @@
+FROM openjdk:17-jdk-slim AS build
+
+WORKDIR /app
+
+RUN ls -a
+
+# Copy the Gradle wrapper files to the container
+COPY gradlew gradlew.bat ./
+COPY gradle gradle
+
+COPY .gradle .gradle
+
+# Copy the build file and settings file
+COPY build.gradle settings.gradle ./
+
+# Copy the source code
+COPY src src
+
+# ARGs
+ARG APPLICATION_NAME
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_NAME
+ARG DB_USERNAME
+ARG DB_PASSWORD
+ARG JWT_KEY
+ARG MAIL_USERNAME
+ARG MAIL_PASSWORD
+ARG REDIS_HOST
+ARG REDIS_PORT
+ARG REDIS_PASSWORD
+ARG DEFAULT_LANGUAGE
+ARG DEFAULT_COUNTRY
+
+RUN ./gradlew build
+
+# Create a new stage for the actual runtime image
+FROM openjdk:17-jdk-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the JAR file from the build stage to the runtime image
+COPY --from=build /app/build/libs/*.jar app.jar
+
+# ARGs
+ARG APPLICATION_NAME
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_NAME
+ARG DB_USERNAME
+ARG DB_PASSWORD
+ARG JWT_KEY
+ARG MAIL_USERNAME
+ARG MAIL_PASSWORD
+ARG REDIS_HOST
+ARG REDIS_PORT
+ARG REDIS_PASSWORD
+ARG DEFAULT_LANGUAGE
+ARG DEFAULT_COUNTRY
+
+ENV APPLICATION_NAME=$APPLICATION_NAME
+ENV DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD
+ENV JWT_KEY=$JWT_KEY
+ENV MAIL_USERNAME=$MAIL_USERNAME MAIL_PASSWORD=$MAIL_PASSWORD
+ENV REDIS_HOST=$REDIS_HOST REDIS_PORT=$REDIS_PORT REDIS_PASSWORD=$REDIS_PASSWORD
+ENV DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE DEFAULT_COUNTRY=$DEFAULT_COUNTRY
+
+# Specify the command to run the Spring Boot application
+CMD ["java", "-jar", "app.jar"]
