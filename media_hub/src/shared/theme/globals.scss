@@ -1,5 +1,5 @@
 @import './helpers';
-@import 'bootstrap/dist/css/bootstrap.rtl.css';
+@import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons';
 @import 'modern-normalize';
 
@@ -57,5 +57,4 @@ body,
   -webkit-font-feature-settings: 'ss02';
   font-feature-settings: 'ss02';
   font-style: normal;
-  direction: rtl;
 }

@@ -50,6 +50,9 @@
     "next-translate-plugin": "^2.6.2",
     "openapi-typescript": "^6.7.5",
     "openapi-typescript-helpers": "^0.0.7",
+    "postcss": "^8.4.38",
+    "postcss-rtlcss": "^5.2.0",
+    "rtlcss": "^4.1.1",
     "sass": "^1.74.1"
   }
 }
