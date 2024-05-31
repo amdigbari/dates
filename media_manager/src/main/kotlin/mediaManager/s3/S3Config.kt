@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.S3Configuration
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import java.net.URI
 
 @Configuration
@@ -21,6 +22,24 @@ class S3Config(val s3Properties: S3Properties) {
                 StaticCredentialsProvider.create(
                     AwsBasicCredentials.create(s3Properties.accessKey, s3Properties.secretKey),
                 ),
+            )
+            .apply {
+                endpointOverride(URI.create(s3Properties.endpoint))
+                serviceConfiguration(
+                    S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build(),
+                )
+            }
+            .build()
+    }
+
+    @Bean
+    fun s3PreSigner(): S3Presigner {
+        return S3Presigner.builder()
+            .region(Region.AWS_GLOBAL)
+            .credentialsProvider(
+                StaticCredentialsProvider.create(AwsBasicCredentials.create(s3Properties.accessKey, s3Properties.secretKey)),
             )
             .apply {
                 endpointOverride(URI.create(s3Properties.endpoint))
