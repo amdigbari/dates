@@ -2,8 +2,6 @@ FROM openjdk:17-jdk-slim AS build
 
 WORKDIR /app
 
-RUN ls -a
-
 # Copy the Gradle wrapper files to the container
 COPY gradlew gradlew.bat ./
 COPY gradle gradle

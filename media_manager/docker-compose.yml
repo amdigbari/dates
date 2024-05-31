@@ -13,7 +13,7 @@ services:
         DB_USERNAME: ${DB_USERNAME:-dates}
         DB_PASSWORD: ${DB_PASSWORD:-123456}
 
-        JWT_KEY: ${JWT_KEY:-up65tUz!3zLT7y*Xaok!ZFJCQnCAmb8M8h3Dy%E6swTXRt&TjeygD8zKdRb9yS}
+        JWT_KEY: ${JWT_KEY:-c3f4c50798fa1e4936c8b5a1431e7edb56f9169f7a2c4968af9986b5b0cb9c902437891ccd1bf8e94fee394cf528eb08b51baf328aa05f4bffdc7909e446534b}
 
         MAIL_USERNAME: ${MAIL_USERNAME}
         MAIL_PASSWORD: ${MAIL_PASSWORD}
@@ -34,8 +34,7 @@ services:
     depends_on:
       - mysql
       - redis
-    volumes:
-      - .:/app
+
   mysql:
     image: mysql:latest
     environment:
@@ -72,7 +71,7 @@ services:
   minioinitializer:
     image: minio/mc
     entrypoint: sh
-    command: -c "mc alias set miniostorage ${S3_ENDPOINT:-http://localhost:9000} ${S3_ACCESS_KEY:-minioadmin} ${S3_SECRET_KEY:-minioadmin} && mc mb miniostorage/${S3_BUCKET_NAME:-media-manager}; mc anonymous set download miniostorage/${S3_BUCKET_NAME:-media-manager};"
+    command: -c "mc alias set miniostorage ${S3_ENDPOINT:-http://localhost:9000} ${S3_ACCESS_KEY:-minioadmin} ${S3_SECRET_KEY:-minioadmin} && mc mb miniostorage/${S3_BUCKET_NAME:-media-manager};"
     depends_on:
       - miniostorage
 
