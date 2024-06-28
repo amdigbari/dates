@@ -1,5 +1,8 @@
 package mediaManager.user
 
+import io.jsonwebtoken.UnsupportedJwtException
+import mediaManager.auth.TokenService
+import mediaManager.auth.TokenUtils
 import mediaManager.exceptions.CustomIllegalArgumentException
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val tokenService: TokenService,
     private val passwordEncoder: PasswordEncoder,
     private val messageSource: MessageSource,
 ) {
@@ -60,4 +64,25 @@ class UserService(
      * @throws NoSuchElementException in case email not found in the database.
      */
     fun findByEmail(email: String): User = userRepository.findByEmail(email).get()
+
+    fun findByAuthHeader(authHeader: String?): User {
+        if (!TokenUtils.isStartWithTokenType(authHeader)) {
+            throw UnsupportedJwtException(
+                messageSource.getMessage(
+                    "auth.invalid-token",
+                    null,
+                    "Invalid Token!",
+                    LocaleContextHolder.getLocale(),
+                ),
+            )
+        }
+
+        return findByEmail(
+            tokenService.extractEmail(
+                TokenUtils.extractTokenValue(authHeader!!),
+            ),
+        )
+    }
+
+    // TODO: Implement Get Dates
 }

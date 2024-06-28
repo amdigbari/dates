@@ -1,4 +1,4 @@
-package mediaManager.profile
+package mediaManager.date.datePartner
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -6,21 +6,25 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import mediaManager.date.Date
 import mediaManager.user.User
 
 @Entity
-@Table(name = "profiles")
-data class Profile(
+@Table(name = "dates_partners")
+data class DatePartner(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0, // Added the 0, so I can create instance without error. It will be overwritten by DB.
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     val user: User,
-    @Column(nullable = false)
-    val fullName: String,
-    @Column(nullable = true)
-    val nickname: String?,
+    @ManyToOne
+    @JoinColumn(name = "date_id")
+    val date: Date,
+    @Column
+    val rate: Double = 0.0,
+    @Column
+    val story: String = "",
 )

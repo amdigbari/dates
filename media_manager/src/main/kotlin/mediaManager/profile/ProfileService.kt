@@ -81,12 +81,6 @@ class ProfileService(
             )
         }
 
-        return findByUser(
-            userService.findByEmail(
-                tokenService.extractEmail(
-                    TokenUtils.extractTokenValue(authHeader!!),
-                ),
-            ),
-        )
+        return findByUser(userService.findByAuthHeader(authHeader!!))
     }
 }
